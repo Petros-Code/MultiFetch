@@ -21,31 +21,35 @@ function setupCommentaires() {
   commentaires.appendChild(zoneButtons);
 
   const goBackBtn = document.createElement("button");
-  goBackBtn.textContent = "Previous";
+  goBackBtn.textContent = "Précèdant";
   goBackBtn.classList.add("buttonsCommentaires");
 
   const showTons = document.createElement("button");
-  showTons.textContent = "Show chunks";
+  showTons.textContent = "Afficher un morceau";
   showTons.classList.add("buttonsCommentaires");
 
   const goNextBtn = document.createElement("button");
-  goNextBtn.textContent = "Next";
+  goNextBtn.textContent = "Suivant";
   goNextBtn.classList.add("buttonsCommentaires");
+
+  const resetBtn = document.createElement("button");
+  resetBtn.textContent = "Reset";
+  resetBtn.classList.add("buttonsCommentaires");
 
   const pageDisplay = document.createElement("span");
   pageDisplay.id = "pageDisplay";
-  pageDisplay.textContent = `Page: ${pageNumber + 1}`; // human-readable
+  pageDisplay.textContent = `Page: ${pageNumber + 1}`;
 
   zoneButtons.appendChild(goBackBtn);
   zoneButtons.appendChild(showTons);
   zoneButtons.appendChild(goNextBtn);
+  zoneButtons.appendChild(resetBtn);
   zoneButtons.appendChild(pageDisplay);
 
   const zoneAffichage = document.createElement("div");
   zoneAffichage.id = "zoneAffichageCommentaires";
   commentaires.appendChild(zoneAffichage);
 
-  // Display 20 comments for pagination
   function displayPage(page) {
     zoneAffichage.innerHTML = "";
     const start = page * showAmount;
@@ -58,24 +62,24 @@ function setupCommentaires() {
     updatePageDisplay();
   }
 
-  // Display 50 comments for chunk loading
   function displayChunk(chunk) {
-    zoneAffichage.innerHTML = "";
     const start = chunk * chunkSize;
     const end = start + chunkSize;
+
+    if (start >= data.length) return;
+
     for (let i = start; i < end && i < data.length; i++) {
       const p = document.createElement("p");
       p.textContent = data[i].body;
       zoneAffichage.appendChild(p);
     }
-    pageDisplay.textContent = `Showing chunk ${chunk + 1}`;
+    pageDisplay.textContent = `Nombre de Morceau (x50): ${chunk + 1}`;
   }
 
   function updatePageDisplay() {
     pageDisplay.textContent = `Page: ${pageNumber + 1}`;
   }
 
-  // Event Listeners
   goNextBtn.addEventListener("click", () => {
     if ((pageNumber + 1) * showAmount < data.length) {
       pageNumber++;
@@ -91,11 +95,19 @@ function setupCommentaires() {
   });
 
   showTons.addEventListener("click", () => {
-    displayChunk(chunkIndex);
-    chunkIndex++;
+    if (chunkIndex * chunkSize < data.length) {
+      displayChunk(chunkIndex);
+      chunkIndex++;
+    }
   });
 
-  // Fetch and init
+  resetBtn.addEventListener("click", () => {
+    zoneAffichage.innerHTML = "";
+    pageNumber = 0;
+    chunkIndex = 0;
+    displayPage(pageNumber);
+  });
+
   async function fetchCommentaires(callback) {
     try {
       const response = await fetch(
