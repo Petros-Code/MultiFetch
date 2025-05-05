@@ -1,4 +1,4 @@
-// Création dynamique des éléments Users
+/* // Création dynamique des éléments Users
 
 let usersTitle = document.createElement("p");
 usersTitle.id = "usersTitle";
@@ -135,3 +135,4 @@ fetchDataUsers();
 displayUsersPagination.addEventListener("click", function () {
   window.location.reload();
 });
+ */
