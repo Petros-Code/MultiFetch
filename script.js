@@ -1,4 +1,13 @@
 //#region Feature Posts by Petros-Code --------------------------------------------------------------------
+const loadButton = document.getElementById("load-posts");
+const postsList = document.getElementById("posts-list");
+const nextPage = document.getElementById("next-posts");
+const previousPage = document.getElementById("previous-posts");
+
+// Je veux stocker tous les posts ET avoir un index de départ pour l'affichage
+let allPosts = [];
+let currentIndex = 0;
+
 async function fetchAllPosts() {
   try {
     const responseFetchAllPosts = await fetch(
@@ -8,17 +17,42 @@ async function fetchAllPosts() {
       throw new Error("erreur réseau");
     }
     console.log(responseFetchAllPosts); // Pour info
-    const dataAllPosts = await responseFetchAllPosts.json();
-    console.log(dataAllPosts);
+    allPosts = await responseFetchAllPosts.json();
+    currentIndex = 0; // Réinitialiser l'index
+    displayPosts(); // Afficher les premiers posts
   } catch (error) {
     console.error("erreur serveur", error);
   }
 }
 
-fetchAllPosts();
+function displayPosts() {
+  postsList.replaceChildren(); //(on vide)
+  const postsToDisplay = allPosts.slice(currentIndex, currentIndex + 5); //on récupère les 5 posts
+  postsToDisplay.forEach((post) => {
+    const li = document.createElement("li");
+    li.textContent = `${post.title} - ${post.body}`;
+    postsList.appendChild(li);
+  });
+}
 
-/* const dataPosts = (await responseFetchAllPosts.json()).dataPosts;
-    const first5Posts = dataPosts.slice(0, 9);
-    first5Posts.map((posts) => console.log(posts.title ?)) */
+nextPage.addEventListener("click", () => {
+  if (currentIndex + 5 < allPosts.length) {
+    currentIndex += 5;
+    displayPosts();
+  } else {
+    console.log("rien à afficher");
+  }
+});
+
+previousPage.addEventListener("click", () => {
+  if (currentIndex + 5 < allPosts.length) {
+    currentIndex -= 5;
+    displayPosts();
+  } else {
+    console.log("rien à afficher");
+  }
+});
+
+loadButton.addEventListener("click", fetchAllPosts);
 
 //#endregion-----------------------------------------------------------------------------------------------
